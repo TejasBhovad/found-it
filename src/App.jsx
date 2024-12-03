@@ -1,4 +1,5 @@
 "use client";
+import { formatDistanceToNow, parseISO } from "date-fns";
 
 import { Heart } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -33,7 +34,6 @@ function JobSearch() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Update localStorage whenever savedJobs changes
   useEffect(() => {
     localStorage.setItem("savedJobs", JSON.stringify(savedJobs));
   }, [savedJobs]);
@@ -56,6 +56,9 @@ function JobSearch() {
   const JobCard = ({ job }) => {
     const jobIdentifier = getJobIdentifier(job);
     const isSaved = savedJobs.includes(jobIdentifier);
+    const postedDate = formatDistanceToNow(parseISO(job.posted_date), {
+      addSuffix: true,
+    });
 
     return (
       <Card className="p-4 space-y-4">
@@ -102,7 +105,7 @@ function JobSearch() {
             {job.type}
           </span>
         </div>
-        <div className="text-sm text-gray-500">Posted {job.postedAt}</div>
+        <div className="text-sm text-gray-500">Posted {postedDate}</div>
       </Card>
     );
   };
@@ -117,8 +120,11 @@ function JobSearch() {
           >
             Role
           </label>
-          <Select value={role} onValueChange={setRole}>
-            <SelectTrigger id="role-select" className="w-full bg-white">
+          <Select value={role} onValueChange={setRole} className=" rounded-md">
+            <SelectTrigger
+              id="role-select"
+              className="w-full bg-white border-gray-200 rounded"
+            >
               <SelectValue placeholder="Select role" />
             </SelectTrigger>
             <SelectContent>
@@ -162,13 +168,24 @@ function JobSearch() {
             Location
           </label>
           <Select value={location} onValueChange={setLocation}>
-            <SelectTrigger id="location-select" className="w-full bg-white">
+            <SelectTrigger
+              id="location-select"
+              className="w-full bg-white  border-gray-200 rounded"
+            >
               <SelectValue placeholder="Select location" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="Los Angeles">Los Angeles</SelectItem>
+              <SelectItem value="New York">New York</SelectItem>
+              <SelectItem value="San Francisco">San Francisco</SelectItem>
               <SelectItem value="Seattle">Seattle</SelectItem>
-              <SelectItem value="United States">United States</SelectItem>
-              <SelectItem value="Remote">Remote</SelectItem>
+              <SelectItem value="Boston">Boston</SelectItem>
+              <SelectItem value="Chicago">Chicago</SelectItem>
+              <SelectItem value="Denver">Denver</SelectItem>
+              <SelectItem value="Austin">Austin</SelectItem>
+              <SelectItem value="District of Columbia">
+                District of Columbia
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -177,7 +194,9 @@ function JobSearch() {
       {isPending ? (
         <div className="text-center">Loading jobs...</div>
       ) : error ? (
-        <div className="text-center text-red-500">Error: {error.message}</div>
+        <div className="text-center text-gray-500">No jobs available</div>
+      ) : !jobs || jobs.length === 0 ? (
+        <div className="text-center text-gray-500">No jobs available</div>
       ) : (
         <>
           {/* Display all jobs */}
